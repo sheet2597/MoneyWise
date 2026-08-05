@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moneywise | Bills & EMIs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-dark: #141821;
+            --sidebar-dark: #1c2230;
+            --card-dark: #232b3b;
+            --accent-gold: #c5a059;
+            --accent-blue: #3d8bfd;
+            --text-muted: #9aa4b2;
+            --gradient: linear-gradient(135deg, #8b5cf6, #22d3ee);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: white;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 230px;
+            height: 100vh;
+            background: var(--sidebar-dark);
+            padding: 30px 20px;
+        }
+
+        
+
+        .sidebar a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 8px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .sidebar a.active {
+            color: white;
+            background: rgba(61, 139, 253, 0.1);
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .sidebar a:hover {
+            color: var(--accent-gold);
+            transform: translateX(5px);
+        }
+
+        .main {
+            margin-left: 230px;
+            padding: 40px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .payment-card {
+            background: var(--card-dark);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+            height: 100%;
+        }
+
+        .payment-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+        }
+
+        .badge-emi {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .badge-sub {
+            background: rgba(13, 202, 240, 0.1);
+            color: #0dcaf0;
+            border: 1px solid #0dcaf0;
+        }
+
+        .progress {
+            background: #141821;
+            height: 8px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            background: var(--gradient);
+            border-radius: 10px;
+        }
+
+        .btn-gold {
+            background: var(--accent-gold);
+            color: #141821;
+            font-weight: 700;
+            border: none;
+        }
+
+        .modal-content {
+            background: var(--card-dark);
+            color: white;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .form-control,
+        .form-select {
+            background: #141821;
+            border: 1px solid #31394e;
+            color: white;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: #141821;
+            color: white;
+            border-color: var(--accent-blue);
+            box-shadow: none;
+        }
+        .stat {
+            font-size: 30px;
+            font-weight: 700;
+            background: var(--gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s infinite alternate;
+        }
+
+        @keyframes gradientMove {
+            from {
+                background-position: left;
+            }
+
+            to {
+                background-position: right;
+            }
+        }
+        @media (max-width: 992px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 12px;
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .sidebar a {
+                display: inline-block;
+                margin-bottom: 0;
+            }
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .header-flex {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <a href="/dashboard" class="stat">MONEYWISE</a>
+        <a href="/dashboard"><i class="fa fa-home me-2"></i>Dashboard</a>
+        <a href="/income"><i class="fa fa-wallet me-2"></i>Income</a>
+        <a href="/assets"><i class="fa fa-piggy-bank me-2"></i>Assets</a>
+        <a href="/expenses"><i class="fa fa-receipt me-2"></i>Expenses</a>
+        <a href="/goals"><i class="fa fa-bullseye me-2"></i>Goals</a>
+        <a href="/recurring" class="active"><i class="fa fa-calendar-check me-2"></i>Bills & EMIs</a>
+        <a href="/budget"><i class="fa fa-chart-pie me-2"></i>Budget</a>
+        <a href="/settings"><i class="fa fa-cog me-2"></i>Settings</a>
+    </div>
+
+    <div class="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show bg-dark text-white border-info" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="header-flex">
+            <h2>Recurring Payments</h2>
+            <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+                <i class="fas fa-plus me-2"></i>Add Bill/EMI
+            </button>
+        </div>
+
+        <div class="row g-4">
+            {% if payments %}
+            {% for p in payments %}
+            <div class="col-md-6 col-lg-4">
+                <div class="payment-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge {% if p.category == 'EMI' %}badge-emi{% else %}badge-sub{% endif %}">
+                            {{ p.category }}
+                        </span>
+                        <div>
+                            <a href="javascript:void(0)" class="text-info me-2"
+                               onclick="openEditRecurringModal(
+                                   '{{ p.payment_id }}',
+                                   '{{ p.title }}',
+                                   '{{ p.amount }}',
+                                   '{{ p.billing_date }}',
+                                   '{{ p.category }}',
+                                   '{{ p.start_date }}',
+                                   '{{ p.end_date }}'
+                               )">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/delete-recurring/{{ p.payment_id }}" class="text-danger"
+                                onclick="return confirm('Delete this recurring payment?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <h4 class="mb-1 text-white">{{ p.title }}</h4>
+                    <p class="text small mb-3">Due on the {{ p.billing_date }}th of every month</p>
+
+                    <div class="d-flex justify-content-between align-items-end mb-3">
+                        <div>
+                            <small class="text d-block">Monthly Amount</small>
+                            <span class="fs-4 fw-bold text-white">₹{{ "{:,.2f}".format(p.amount) }}</span>
+                        </div>
+                    </div>
+
+                    {% if p.category == 'EMI' %}
+                    <div class="mt-2">
+                        <small class="text">Loan Duration</small>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 100%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span>Ends: {{ p.end_date }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mt-2 text-info small">
+                        <i class="fas fa-sync-alt me-1"></i> Ongoing Monthly Subscription
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12 text-center py-5" style="border: 2px dashed #31394e; border-radius: 16px;">
+                <i class="fa fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No recurring payments tracked yet.</h4>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal fade" id="addPaymentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="/recurring" method="POST" onsubmit="return validateModal(this)">
+                    <div class="modal-header border-0">
+                        <h5>Add New Recurring Payment</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="small mb-1">Title</label>
+                            <input type="text" name="title" class="form-control" placeholder="Netflix, Home Loan, etc."
+                                required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="small mb-1">Amount (₹)</label>
+                                <input type="number" name="amount" class="form-control" step="0.01" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="small mb-1">Due Day (1-31)</label>
+                                <input type="number" name="billing_date" class="form-control" min="1" max="31" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small mb-1">Category</label>
+                            <select name="category" class="form-select" id="categorySelect" required>
+                                <option value="Subscription">Subscription (Ongoing)</option>
+                                <option value="EMI">EMI (Has End Date)</option>
+                            </select>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="small mb-1">Start Date</label>
+                                <input type="date" name="start_date" class="form-control" required>
+                            </div>
+                            <div class="col-6" id="endDateCol" style="display: none;">
+                                <label class="small mb-1">End Date</label>
+                                <input type="date" name="end_date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-gold w-100">Save Recurring Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT RECURRING MODAL -->
+    <div class="modal fade" id="editPaymentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="/recurring" method="POST" onsubmit="return validateModal(this)">
+                    <input type="hidden" name="payment_id" id="edit_payment_id">
+                    <div class="modal-header border-0">
+                        <h5>Edit Recurring Payment</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="small mb-1">Title</label>
+                            <input type="text" name="title" id="edit_title" class="form-control" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="small mb-1">Amount (₹)</label>
+                                <input type="number" name="amount" id="edit_amount" class="form-control" step="0.01" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="small mb-1">Due Day (1-31)</label>
+                                <input type="number" name="billing_date" id="edit_billing_date" class="form-control" min="1" max="31" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small mb-1">Category</label>
+                            <select name="category" class="form-select" id="edit_category" required>
+                                <option value="Subscription">Subscription (Ongoing)</option>
+                                <option value="EMI">EMI (Has End Date)</option>
+                            </select>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="small mb-1">Start Date</label>
+                                <input type="date" name="start_date" id="edit_start_date" class="form-control" required>
+                            </div>
+                            <div class="col-6" id="editEndDateCol">
+                                <label class="small mb-1">End Date</label>
+                                <input type="date" name="end_date" id="edit_end_date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-gold w-100">Update Recurring Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script to show/hide End Date based on Category (Add)
+        document.getElementById('categorySelect').addEventListener('change', function () {
+            var endDateCol = document.getElementById('endDateCol');
+            if (this.value === 'EMI') {
+                endDateCol.style.display = 'block';
+                document.querySelector('[name="end_date"]').required = true;
+            } else {
+                endDateCol.style.display = 'none';
+                document.querySelector('[name="end_date"]').required = false;
+            }
+        });
+
+        // Open Edit Recurring Modal with values
+        function openEditRecurringModal(id, title, amount, billing_date, category, start_date, end_date) {
+            document.getElementById('edit_payment_id').value = id;
+            document.getElementById('edit_title').value = title;
+            document.getElementById('edit_amount').value = amount;
+            document.getElementById('edit_billing_date').value = billing_date;
+            document.getElementById('edit_category').value = category;
+            document.getElementById('edit_start_date').value = start_date;
+            document.getElementById('edit_end_date').value = end_date || '';
+
+            var editEndDateCol = document.getElementById('editEndDateCol');
+            if (category === 'EMI') {
+                editEndDateCol.style.display = 'block';
+            } else {
+                editEndDateCol.style.display = 'none';
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('editPaymentModal'));
+            modal.show();
+        }
+
+        // Toggle edit End Date visibility on category change in Edit modal
+        document.getElementById('edit_category').addEventListener('change', function () {
+            var editEndDateCol = document.getElementById('editEndDateCol');
+            if (this.value === 'EMI') {
+                editEndDateCol.style.display = 'block';
+            } else {
+                editEndDateCol.style.display = 'none';
+                document.getElementById('edit_end_date').value = '';
+            }
+        });
+    </script>
+    <script>
+        function capFirstAlpha(s){const i=s.search(/[A-Za-z]/);return i===-1?s:s.slice(0,i)+s.charAt(i).toUpperCase()+s.slice(i+1)}
+        document.addEventListener("input",function(e){const el=e.target;if(el.matches(".modal input[type='text']")){el.value=capFirstAlpha(el.value)}})
+        document.addEventListener("blur",function(e){const el=e.target;if(el.matches(".modal input[type='text']")){el.value=capFirstAlpha(el.value)}},true)
+        function validateModal(form){for(const el of form.querySelectorAll('input,select,textarea')){const t=el.type;if(el.hasAttribute('required')&&(!el.value||el.value.trim()==='')){alert('Please fill all required fields');el.focus();return false}if(t==='number'){const v=parseFloat(el.value);if(isNaN(v)){alert('Enter valid number');el.focus();return false}const min=el.getAttribute('min');if(min!==null&&v<parseFloat(min)){alert('Number below minimum');el.focus();return false}}}const sd=form.querySelector('[name=\"start_date\"]');const ed=form.querySelector('[name=\"end_date\"]');if(sd&&ed&&sd.value&&ed.value){if(new Date(ed.value)<new Date(sd.value)){alert('End Date must be after Start Date');ed.focus();return false}}return true}
+    </script>
+</body>
+
+</html>

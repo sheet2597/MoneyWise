@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyWise | Expenses</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #141821;
+            --sidebar-dark: #1c2230;
+            --card-dark: #232b3b;
+            --accent-gold: #c5a059;
+            --accent-red: #ea5455;
+            --accent-blue: #3d8bfd;
+            --text-muted: #9aa4b2;
+            --gradient: linear-gradient(135deg, #8b5cf6, #22d3ee);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: white;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            position: fixed;
+            width: 230px;
+            height: 100vh;
+            background: var(--sidebar-dark);
+            padding: 30px 20px;
+        }
+
+        .sidebar h4 {
+            color: var(--accent-gold);
+            margin-bottom: 40px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: 0.3s;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .sidebar a.active {
+            color: white;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(61, 139, 253, 0.1);
+        }
+
+        .sidebar a:hover {
+            color: var(--accent-gold);
+            transform: translateX(5px);
+        }
+
+        /* ================= MAIN ================= */
+        .main {
+            margin-left: 230px;
+            padding: 40px;
+        }
+
+        /* ================= CARD ================= */
+        .expense-table {
+            background: var(--card-dark);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ================= TABLE ================= */
+        .table {
+            background-color: transparent !important;
+            color: #d6deeb !important;
+            margin-bottom: 0;
+        }
+
+        .table>:not(caption)>*>* {
+            background-color: transparent !important;
+        }
+
+        .custom-table thead {
+            background: var(--card-dark);
+        }
+
+        .custom-table th {
+            color: var(--accent-gold);
+            font-weight: 600;
+            padding: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .custom-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #cfd8e3;
+        }
+
+        .custom-table tbody tr {
+            transition: 0.3s ease;
+        }
+
+        .custom-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+
+        .text-danger {
+            color: var(--accent-red) !important;
+            font-weight: 600;
+        }
+
+        .action-btn {
+            cursor: pointer;
+            margin-right: 12px;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* ================= MODAL ================= */
+        .modal-content {
+            background: var(--card-dark);
+            color: white;
+            border-radius: 18px;
+        }
+
+        .form-control {
+            background: #1c2230;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .form-control:focus {
+            background: #1c2230;
+            color: white;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 0.1rem rgba(197, 160, 89, 0.25);
+        }
+
+        .stat {
+            font-size: 30px;
+            font-weight: 700;
+            background: var(--gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s infinite alternate;
+        }
+
+        @keyframes gradientMove {
+            from {
+                background-position: left;
+            }
+
+            to {
+                background-position: right;
+            }
+        }
+        @media (max-width: 992px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 12px;
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .sidebar a {
+                display: inline-block;
+                margin-bottom: 0;
+            }
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/dashboard" class="stat">MONEYWISE</a>
+        <a href="/dashboard"><i class="fa fa-home me-2"></i>Dashboard</a>
+        <a href="/income"><i class="fa fa-wallet me-2"></i>Income</a>
+        <a href="/assets"><i class="fa fa-piggy-bank me-2"></i>Assets</a>
+        <a href="/expenses" class="active"><i class="fa fa-receipt me-2"></i>Expenses</a>
+        <a href="/goals"><i class="fa fa-bullseye me-2"></i>Goals</a>
+        <a href="/recurring" ><i class="fa fa-calendar-check me-2"></i>Bills & EMIs</a>
+        <a href="/budget"><i class="fa fa-chart-pie me-2"></i>Budget</a>
+        <a href="/settings"><i class="fa fa-cog me-2"></i>Settings</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for msg_cat, message in messages %}
+        <div class="alert alert-{{ msg_cat }} alert-dismissible fade show bg-dark text-white border-info" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="d-flex justify-content-between mb-4">
+            <h2>Expenses</h2>
+            <div>
+                <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#expenseCsvModal">
+                    <i class="fa fa-download me-2"></i>Download CSV
+                </button>
+                <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+                    <i class="fa fa-plus"></i> Add Expense
+                </button>
+            </div>
+
+        </div>
+
+        <!-- CHART -->
+        <div class="chart-card">
+            <h5 class="mb-3">Expense by Category</h5>
+            <img src="data:image/png;base64,{{ chart }}" class="img-fluid">
+        </div>
+
+        <!-- TABLE (SAME STYLE AS INCOME) -->
+        <div class="expense-table">
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in transactions %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ e.expense_date }}</td>
+                        <td>{{ e.expense_title }}</td>
+                        <td>{{ e.category }}</td>
+                        <td class="text-danger">₹ {{ e.amount }}</td>
+                        <td>
+                            <i class="fa fa-edit text-warning action-btn" onclick="openUpdateModal(
+                                   '{{ e.expense_id }}',
+                                   '{{ e.expense_title }}',
+                                   '{{ e.category }}',
+                                   '{{ e.amount }}',
+                                   '{{ e.expense_date }}',
+                                   '{{ e.notes }}'
+                               )"></i>
+
+                            <i class="fa fa-trash text-danger action-btn"
+                                onclick="deleteExpense('{{ e.expense_id }}')"></i>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- EXPENSE CSV DATE RANGE MODAL -->
+    <div class="modal fade" id="expenseCsvModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Download Expense CSV</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="GET" action="/download-expense-csv">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" name="start_date" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">End Date</label>
+                                <input type="date" name="end_date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-outline-info btn-sm w-100">Download</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ADD EXPENSE MODAL -->
+    <div class="modal fade" id="addExpenseModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background:#232a3b; color:white; border-radius:12px;">
+
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Add Expense</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="POST" action="/expenses" onsubmit="return validateModal(this)">
+                    <div class="modal-body">
+
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label class="form-label">Expense Title</label>
+                            <input type="text" name="expense_title" class="form-control" pattern="^[A-Za-z0-9 ]{3,50}$"
+                                title="Only letters and numbers (3-50 characters)" required>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select form-control" required>
+                                <option value="">Select Category</option>
+                                <option value="Food">Food</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Health">Health</option>
+                                <option value="Education">Education</option>
+                                <option value="Subscription">Subscription</option>
+                                <option value="EMI">EMI</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="add_custom_category_group">
+                            <label class="form-label">Category Name</label>
+                            <input type="text" name="custom_category" id="add_custom_category" class="form-control" pattern="^[A-Za-z][A-Za-z &-]{1,30}$">
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <input type="number" name="amount" class="form-control" min="0" step="0.01" required>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="mb-3">
+                            <label class="form-label">Expense Date</label>
+                            <input type="date" name="expense_date" class="form-control" required>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <input type="text" name="notes" class="form-control" maxlength="200">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="updateExpenseModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background:#232a3b; color:white; border-radius:12px;">
+
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Add Expense</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="POST" action="/expenses" onsubmit="return validateModal(this)">
+                    <div class="modal-body">
+                        <input type="hidden" name="expense_id" id="update_id">
+
+                        <div class="mb-3">
+                            <label class="form-label">Expense Title</label>
+                            <input type="text" name="expense_title" id="update_title" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select form-control" id="update_category" required>
+                                <option value="Food">Food</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Health">Health</option>
+                                <option value="Education">Education</option>
+                                <option value="Subscription">Subscription</option>
+                                <option value="EMI">EMI</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="update_custom_category_group">
+                            <label class="form-label">Category Name</label>
+                            <input type="text" name="custom_category" id="update_custom_category" class="form-control" pattern="^[A-Za-z][A-Za-z &-]{1,30}$">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <input type="number" name="amount" id="update_amount" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Expense Date</label>
+                            <input type="date" name="expense_date" id="update_date" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <input type="text" name="notes" id="update_notes" class="form-control">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-outline-warning btn-sm ">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function openUpdateModal(id, title, category, amount, date, notes) {
+            document.getElementById("update_id").value = id;
+            document.getElementById("update_title").value = title;
+            document.getElementById("update_category").value = category;
+            (function(){
+                var sel = document.getElementById("update_category");
+                var known = Array.from(sel.options).some(function(o){ return o.value === category; });
+                if(!known){
+                    sel.value = "Other";
+                    var g = document.getElementById("update_custom_category_group");
+                    var i = document.getElementById("update_custom_category");
+                    g.classList.remove("d-none");
+                    i.required = true;
+                    i.value = category;
+                }
+            })();
+            document.getElementById("update_amount").value = amount;
+            document.getElementById("update_date").value = date;
+            document.getElementById("update_notes").value = notes;
+
+            var modal = new bootstrap.Modal(document.getElementById('updateExpenseModal'));
+            modal.show();
+        }
+
+        function deleteExpense(id) {
+            if (!confirm("Are you sure you want to delete this expense?")) return;
+
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = "/expenses";
+
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "expense_id1";
+            input.value = id;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+        function capFirstAlpha(s){const i=s.search(/[A-Za-z]/);return i===-1?s:s.slice(0,i)+s.charAt(i).toUpperCase()+s.slice(i+1)}
+        document.addEventListener("input",function(e){const el=e.target;if(el.matches(".modal input[type='text']")){el.value=capFirstAlpha(el.value)}})
+        document.addEventListener("blur",function(e){const el=e.target;if(el.matches(".modal input[type='text']")){el.value=capFirstAlpha(el.value)}},true)
+        function setupCategoryToggle(selectEl, groupEl, inputEl){
+            function sync(){
+                if(selectEl.value==="Other"){
+                    groupEl.classList.remove("d-none");
+                    inputEl.required = true;
+                }else{
+                    groupEl.classList.add("d-none");
+                    inputEl.required = false;
+                    inputEl.value = "";
+                }
+            }
+            selectEl.addEventListener("change", sync);
+            sync();
+        }
+        document.addEventListener("DOMContentLoaded", function(){
+            var addSel = document.querySelector("#addExpenseModal select[name='category']");
+            var addGrp = document.getElementById("add_custom_category_group");
+            var addInp = document.getElementById("add_custom_category");
+            if(addSel && addGrp && addInp){ setupCategoryToggle(addSel, addGrp, addInp); }
+            var updSel = document.getElementById("update_category");
+            var updGrp = document.getElementById("update_custom_category_group");
+            var updInp = document.getElementById("update_custom_category");
+            if(updSel && updGrp && updInp){ setupCategoryToggle(updSel, updGrp, updInp); }
+        });
+    </script>
+    
+    
+
+</body>
+
+</html>

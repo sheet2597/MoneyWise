@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyWise | Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --accent-gold: #c5a059;
+            --gradient:linear-gradient(135deg,#8b5cf6,#22d3ee);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1f2b, #11141d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Animated Background Glow */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(197,160,89,0.25), transparent 70%);
+            bottom: -200px;
+            left: -200px;
+            animation: pulse 7s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 0.6; }
+        }
+
+        .signup-card {
+            position: relative;
+            width: 450px;
+            padding: 45px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            animation: fadeUp 1s ease-in-out;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand {
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        .signup-card h3 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 10px rgba(197,160,89,0.4);
+            background: transparent;
+            color: white;
+        }
+
+        label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .btn-signup {
+            background: linear-gradient(45deg, #c5a059, #e8c47a);
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-signup:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(197,160,89,0.4);
+        }
+
+        .text-link {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .text-link a {
+            color: var(--accent-gold);
+            text-decoration: none;
+        }
+
+        .text-link a:hover {
+            text-decoration: underline;
+        }
+        .stat{
+            font-size: 30px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            background: var(--gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-card">
+
+    <div class="brand stat">MONEYWISE</div>
+    <h3>Create Account 🚀</h3>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show bg-dark text-white border-info mt-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/signup" onsubmit="return validateEmail(this.email.value)">
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label>First Name</label>
+                <input type="text" name="first_name" class="form-control" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Last Name</label>
+                <input type="text" name="last_name" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>Email Address</label>
+            <input type="text" name="email" class="form-control" pattern="^\w+([.-]?\w+)*@\w+([.]?\w+)*(\.\w{2,3})+$" required>
+        </div>
+
+        
+        <button type="submit" class="btn btn-signup w-100 py-2">
+    Get OTP
+</button>
+
+    </form>
+
+    <div class="text-center mt-4 text-link">
+        Already have an account?
+        <a href="/login">Login</a>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function validateEmail(v){
+    const pattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!pattern.test(v)) {
+        alert("Please enter a valid email address.");
+        return false;
+    }
+    const lower = v.toLowerCase();
+    if (!lower.endsWith("@gmail.com") && !lower.endsWith("@yahoo.com")) {
+        alert("Email must end with @gmail.com or @yahoo.com.");
+        return false;
+    }
+    return true;
+}
+</script>
+
+</body>
+</html>

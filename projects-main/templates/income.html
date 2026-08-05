@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyWise | Income</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #141821;
+            --sidebar-dark: #1c2230;
+            --card-dark: #232b3b;
+            --accent-gold: #c5a059;
+            --accent-green: #28c76f;
+            --accent-blue: #3d8bfd;
+            --text-muted: #9aa4b2;
+            --gradient: linear-gradient(135deg, #8b5cf6, #22d3ee);
+        }
+
+        .stat {
+            font-size: 30px;
+            font-weight: 700;
+            background: var(--gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s infinite alternate;
+        }
+
+        @keyframes gradientMove {
+            from {
+                background-position: left;
+            }
+
+            to {
+                background-position: right;
+            }
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            width: 230px;
+            height: 100vh;
+            background: var(--sidebar-dark);
+            padding: 30px 20px;
+
+        }
+
+        .sidebar h4 {
+            color: var(--accent-gold);
+            margin-bottom: 40px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: 0.3s;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .sidebar a.active {
+            color: white;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(61, 139, 253, 0.1);
+        }
+
+        .sidebar a:hover {
+            color: var(--accent-gold);
+            transform: translateX(5px);
+        }
+
+        /* Main */
+        .main {
+            margin-left: 230px;
+            padding: 30px;
+        }
+
+        /* .income-table {
+            background: var(--card-dark);
+            padding: 20px;
+            border-radius: 15px;
+        } */
+
+        .table {
+            color: white;
+        }
+
+        .table thead {
+            color: var(--accent-gold);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .action-btn {
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .modal-content {
+            background: #232b3b;
+            color: white;
+            border-radius: 15px;
+        }
+
+        .form-control {
+            background: #1c2230;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Remove Bootstrap white background */
+        .table {
+            background-color: transparent !important;
+            color: #d6deeb !important;
+            margin-bottom: 0;
+        }
+
+        /* Card container */
+        .income-table {
+            background: #232b3b;
+            /* same as your card */
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Header */
+        .custom-table thead {
+            background: #232b3b;
+        }
+
+        .custom-table th {
+            color: #c5a059;
+            font-weight: 600;
+            padding: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Body */
+        .custom-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #cfd8e3;
+        }
+
+        /* Row hover */
+        .custom-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+
+        /* Remove default borders */
+        .table>:not(caption)>*>* {
+            background-color: transparent !important;
+        }
+
+        .action-btn {
+            cursor: pointer;
+            margin-right: 12px;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* Green amount */
+        .text-success {
+            color: #28c76f !important;
+            font-weight: 600;
+        }
+
+        .form-control {
+            background: #1c2230;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .form-control:focus {
+            background: #1c2230;
+            color: white;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 0.1rem rgba(197, 160, 89, 0.25);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/dashboard" class="stat">MONEYWISE</a>
+        <a href="/dashboard"><i class="fa fa-home me-2"></i>Dashboard</a>
+        <a href="/income" class="active"><i class="fa fa-wallet me-2"></i>Income</a>
+        <a href="/assets"><i class="fa fa-piggy-bank me-2"></i>Assets</a>
+        <a href="/expenses"><i class="fa fa-receipt me-2"></i>Expenses</a>
+        <a href="/goals" ><i class="fa fa-bullseye me-2"></i>Goals</a>
+        <a href="/budget"><i class="fa fa-chart-pie me-2"></i>Budget</a>
+        <a href="/recurring" ><i class="fa fa-calendar-check me-2"></i>Bills & EMIs</a>
+        <a href="/settings"><i class="fa fa-cog me-2"></i>Settings</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show bg-dark text-white border-info" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="d-flex justify-content-between mb-4">
+            <h2>Income</h2>
+            <div>
+                <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#incomeCsvModal">
+                    <i class="fa fa-download me-2"></i>Download CSV
+                </button>
+                <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#addincomeModal">
+                    <i class="fa fa-plus"></i> Add Income
+                </button>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="income-table">
+            <table class="table custom-table">
+
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Source</th>
+                        <th>Amount</th>
+                        <th>Notes</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in transactions %}
+                    <tr>
+                        <td>{{ loop.index}}</td>
+                        <td>{{ i.income_date }}</td>
+                        <td>{{ i.source }}</td>
+                        <td class="text-success">₹ {{ i.amount }}</td>
+                        <td>{{ i.notes }}</td>
+                        <td>
+                            <i class="fa fa-edit text-warning action-btn" onclick="openUpdateModal(
+                               '{{ i.income_id }}',
+                               '{{ i.source }}',
+                               '{{ i.amount }}',
+                               '{{ i.income_date }}',
+                               '{{ i.notes }}'
+                           )"></i>
+
+                            <i class="fa fa-trash text-danger action-btn"
+                                onclick="deleteIncome('{{ i.income_id }}')"></i>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- INCOME CSV DATE RANGE MODAL -->
+    <div class="modal fade" id="incomeCsvModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Download Income CSV</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="GET" action="/download-income-csv">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" name="start_date" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">End Date</label>
+                                <input type="date" name="end_date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-outline-info btn-sm w-100">Download</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ADD INCOME MODAL ================= -->
+    <div class="modal fade" id="addincomeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background:#232a3b; color:white; border-radius:12px;">
+
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Add Assets</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="POST" action="/income">
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label class="form-label">Source</label>
+                            <input type="text" name="Source" class="form-control" required>
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <input type="number" name="amount" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">income Date</label>
+                            <input type="date" name="income_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">notes</label>
+                            <input type="text" name="notes" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-outline-warning ">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= UPDATE INCOME MODAL ================= -->
+    <div class="modal fade" id="updateincomeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background:#232a3b; color:white; border-radius:12px;">
+
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Update Income</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="POST" action="/income">
+                    <div class="modal-body">
+                        <input type="hidden" name="income_id" id="update_id">
+
+                        <div class="mb-3">
+                            <label class="form-label">Source</label>
+                            <input type="text" name="Source" id="update_source" class="form-control" required>
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <input type="number" name="amount" id="update_amount" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">income Date</label>
+                            <input type="date" name="income_date" id="update_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">notes</label>
+                            <input type="text" name="notes" id="update_notes" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-outline-warning ">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function openUpdateModal(id, source, amount, date, notes) {
+
+            document.getElementById("update_id").value = id;
+            document.getElementById("update_source").value = source;
+            document.getElementById("update_amount").value = amount;
+            document.getElementById("update_date").value = date;
+            document.getElementById("update_notes").value = notes;
+
+            var modal = new bootstrap.Modal(document.getElementById('updateincomeModal'));
+            modal.show();
+        }
+
+        function deleteIncome(id) {
+            if (!confirm("Are you sure you want to delete this income?")) return;
+
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = "/income";
+
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "income_id1";
+            input.value = id;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+        function capFirstAlpha(s){const i=s.search(/[A-Za-z]/);return i===-1?s:s.slice(0,i)+s.charAt(i).toUpperCase()+s.slice(i+1)}
+        document.addEventListener("input",function(e){const el=e.target;if(el.matches(".modal input[type='text']")){el.value=capFirstAlpha(el.value)}})
+        document.addEventListener("blur",function(e){const el=e.target;if(el.matches(".modal input[type='text']")){el.value=capFirstAlpha(el.value)}},true)
+    </script>
+
+</body>
+
+</html>
